@@ -17,7 +17,7 @@ class AppService {
         "method": "flickr.photos.search",
         "api_key": "739b660ea3629666d04b83ad0a19a381",
         "format": "json",
-        "per_page": "20",
+        "per_page": "30",
         "nojsoncallback": "1",
         ]
     

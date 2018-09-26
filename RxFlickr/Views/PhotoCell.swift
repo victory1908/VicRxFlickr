@@ -2,8 +2,8 @@
 //  CollectionViewCell.swift
 //  RxFlickr
 //
-//  Created by Tae joong Yoon on 22/09/2018.
-//  Copyright © 2018 Tae joong Yoon. All rights reserved.
+//  Created by victory1908 on 2018. 9. 26..
+//  Copyright © 2018 Victory1908. All rights reserved.
 //
 
 import UIKit

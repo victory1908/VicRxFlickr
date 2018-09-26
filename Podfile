@@ -2,31 +2,30 @@
 
 target 'RxFlickr' do
    use_frameworks!
-  # Pods for RxFlickr
+ # Pods for RxFlickr
 
-  # Architecture
-  pod 'ReactorKit'
+ # Architecture
+ pod 'ReactorKit'
 
-  # Rx
-  pod 'RxSwift'
-  pod 'RxCocoa'
-  pod 'RxDataSources'
-  pod 'RxOptional'
+ # Rx
+ pod 'RxSwift'
+ pod 'RxCocoa'
+#  pod 'RxDataSources'
+ pod 'RxOptional'
 
-  # UI
-  pod 'SnapKit'
+ # UI
+ pod 'SnapKit'
 
-  # Network
-  pod 'Alamofire'
-  pod 'Kingfisher'
-  pod 'AlamofireNetworkActivityIndicator'
+ # Network
+ pod 'Alamofire'
+ pod 'Kingfisher'
+#  pod 'AlamofireNetworkActivityIndicator'
 
-  # Parsing
-  pod 'SwiftyJSON'
-  pod 'ObjectMapper'
+ # Parsing
+ pod 'SwiftyJSON'
+ pod 'ObjectMapper'
 
-  # Misc.
-  pod 'ReusableKit'
-  pod 'Then'
+ # Misc.
+ pod 'Then'
 
 end

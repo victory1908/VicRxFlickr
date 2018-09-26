@@ -11,33 +11,14 @@ import SnapKit
 import Kingfisher
 import RxCocoa
 import RxSwift
-import RxDataSources
-import ReusableKit
 import Then
 import ReactorKit
 import RxOptional
-
-struct SectionOfPhoto {
-    var header: String
-    var items: [Item]
-}
-extension SectionOfPhoto: SectionModelType {
-    typealias Item = Photo
-    
-    init(original: SectionOfPhoto, items: [Item]) {
-        self = original
-        self.items = items
-    }
-}
 
 //class PhotoListViewController: UIViewController, ReactorKit.View {
 class PhotoListViewController: UIViewController, StoryboardView {
     
     // MARK : Constants
-    
-    struct Reusable {
-        static let flickrCell = ReusableCell<PhotoCell>()
-    }
     
     struct Constant {
         static let cellIdentifier = "cell"
@@ -56,17 +37,6 @@ class PhotoListViewController: UIViewController, StoryboardView {
     
     // MARK: Properties
     
-    let dataSources = RxCollectionViewSectionedReloadDataSource<SectionOfPhoto>(configureCell: { dataSource,
-        collectionView,
-        indexPath,
-        item in
-        let cell = collectionView.dequeue(Reusable.flickrCell, for: indexPath)
-        let url = URL(string: item.flickrURL())
-        cell.flickrPhoto.kf.setImage(with: url)
-        
-        return cell
-    })
-    
     let searchBar = UISearchBar(frame: .zero).then{
         $0.searchBarStyle = .prominent
         $0.placeholder = "Search Flickr"
@@ -79,7 +49,7 @@ class PhotoListViewController: UIViewController, StoryboardView {
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .white
-        collectionView.register(Reusable.flickrCell)
+        collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: Constant.cellIdentifier)
         return collectionView
     }()
     
@@ -164,27 +134,15 @@ class PhotoListViewController: UIViewController, StoryboardView {
         reactor.state.map { $0.photos }
             .replaceNilWith([])
             .asDriver(onErrorJustReturn: [])
-//            .drive(collectionView.rx.items(dataSource: dataSources))
             .drive(collectionView.rx.items) { (collectionView, row, photo) in
                 let indexPath = IndexPath(row: row, section: 0)
-                let cell = collectionView.dequeue(Reusable.flickrCell, for: indexPath)
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constant.cellIdentifier, for: indexPath) as! PhotoCell
                 let url = URL(string: photo.flickrURL())
                 cell.flickrPhoto.kf.setImage(with: url)
                 
                 return cell
             }
             .disposed(by: disposeBag)
-        
-//        // State
-//        reactor.state.map { $0.photos }
-//            .replaceNilWith([])
-//            .bind(to: collectionView.rx.items(dataSource: dataSources))
-//            .disposed(by: disposeBag)
-        
-//        // State
-//        reactor.state.map {$0.photos}
-//            .bind(to: collectionView.rx.items(dataSource: dataSources))
-//            .disposed(by: disposeBag)
         
     }
 }
