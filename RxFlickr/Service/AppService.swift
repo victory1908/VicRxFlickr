@@ -25,29 +25,26 @@ class AppService {
         "Content-Type": "application/json"
     ]
     
-    static func request(_ query: String, _ page: Int) -> Observable<(photos: [Photo], nextPage: Int?)> {
+    static func request(_ query: String, _ page: Int) -> Observable<(photos: [Photo], nextPage: Int)> {
         return Observable.create { observer -> Disposable in
             var params = parameters
             params["page"] = "\(page)"
             params["text"] = query
             
             Alamofire.request(BASE_URL, parameters: params, headers: headers).responseJSON { response in
-                
             switch response.result {
                 case .success(let value):
                     let result = JSON(value)["photos"]["photo"].rawString()
                     let photos = Mapper<Photo>().mapArray(JSONString: result!)
-                    
-//                    let nextPage = photos!.isEmpty ? nil : page + 1
                     let nextPage = page + 1
                     observer.onNext(((photos ?? []),nextPage))
                     observer.onCompleted()
                     
                 case .failure(let error):
                     observer.onError(error)
+                    print(error)
                 }
             }
-            
             return Disposables.create()
         }
     }

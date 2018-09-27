@@ -14,7 +14,7 @@ target 'RxFlickr' do
  pod 'RxOptional'
 
  # UI
- pod 'SnapKit'
+# pod 'SnapKit'
 
  # Network
  pod 'Alamofire'
@@ -26,6 +26,6 @@ target 'RxFlickr' do
  pod 'ObjectMapper'
 
  # Misc.
- pod 'Then'
+# pod 'Then'
 
 end

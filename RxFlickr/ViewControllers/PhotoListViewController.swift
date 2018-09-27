@@ -7,18 +7,20 @@
 //
 
 import UIKit
-import SnapKit
 import Kingfisher
 import RxCocoa
 import RxSwift
-import Then
 import ReactorKit
 import RxOptional
 
-//class PhotoListViewController: UIViewController, ReactorKit.View {
 class PhotoListViewController: UIViewController, StoryboardView {
     
-    // MARK : Constants
+// MARK: Properties
+    @IBOutlet weak var collectionView: UICollectionView!
+    
+    let searchController = UISearchController(searchResultsController: nil)
+    
+// MARK : Constants
     
     struct Constant {
         static let cellIdentifier = "cell"
@@ -31,70 +33,41 @@ class PhotoListViewController: UIViewController, StoryboardView {
         static let edgeInset : CGFloat = 10
     }
     
-    // MARK : Rx
+// MARK : Rx
     
     var disposeBag = DisposeBag()
     
-    // MARK: Properties
     
-    let searchBar = UISearchBar(frame: .zero).then{
-        $0.searchBarStyle = .prominent
-        $0.placeholder = "Search Flickr"
-        $0.sizeToFit()
-    }
+// MARK: Initializing
     
-    let collectionView : UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero
-            , collectionViewLayout: UICollectionViewFlowLayout())
-        
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .white
-        collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: Constant.cellIdentifier)
-        return collectionView
-    }()
-    
-    // MARK: Initializing
-    
-    init(reactor: PhotoListViewReactor) {
-        super.init(nibName: nil, bundle: nil)
-        self.reactor = reactor
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    // MARK: View Life Cycle
+// MARK: View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.title = "Search RxFlickr"
-        self.view.addSubview(self.searchBar)
-        self.view.addSubview(self.collectionView)
         
-        setupConstraints()
+        collectionView.scrollIndicatorInsets.top = collectionView.contentInset.top
+        searchController.dimsBackgroundDuringPresentation = false
+        navigationItem.searchController = searchController
+        UIView.setAnimationsEnabled(true)
+    }
+    
+    
+    
+    override func viewDidAppear(_ animated: Bool) {
+//        UIView.setAnimationsEnabled(false)
+        searchController.isActive = true
+        searchController.isActive = false
+//        UIView.setAnimationsEnabled(true)
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-    // MARK: Constraints
+// MARK: Constraints
     
-    
-    func setupConstraints() {
-        self.collectionView.snp.makeConstraints{ make in
-            make.top.equalTo(self.searchBar.snp.bottom)
-            make.left.right.bottom.equalTo(self.view)
-        }
-        
-        self.searchBar.snp.makeConstraints{ make in
-            make.top.equalTo(self.view).offset(20 + 44)
-            make.left.right.equalTo(self.view)
-        }
-    }
-    
-    // MARK: Binding
+// MARK: Binding
     
     func bind(reactor: PhotoListViewReactor) {
         // DataSource
@@ -102,48 +75,74 @@ class PhotoListViewController: UIViewController, StoryboardView {
         
         self.collectionView.rx.modelSelected(Photo.self)
             .subscribe(onNext: { photo in
-                let view = DetailViewController()
-                view.photo = photo
-                self.navigationController?.pushViewController(view, animated: true)
+                
+                guard let detailVC = self.storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as? DetailViewController else {
+                    fatalError("DetailViewController not found")
+                }
+                detailVC.photo = photo
+                self.navigationController?.pushViewController(detailVC, animated: true)
             })
             .disposed(by: disposeBag)
         
-        // Action
+    // Action
         
         // Search
-        self.searchBar.rx.text
+        self.searchController.searchBar.rx.text
             .filterNil()
+            .filter{$0 != ""}
             .debounce(1.0, scheduler: MainScheduler.instance)
 //            .throttle(0.3, scheduler: MainScheduler.instance)
             .distinctUntilChanged()
+            .do {
+                print("fired")
+                self.collectionView.reloadData()
+            }
             .map {Reactor.Action.updateQuery($0)}
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
         // LoadMore
         self.collectionView.rx.contentOffset
+//            .filter{ bool in return bool && (searchBar.text! != "")}
             .filter { [weak self] offset in
                 guard let strongSelf = self else { return false }
                 guard strongSelf.collectionView.frame.height > 0 else { return false }
                 return offset.y + strongSelf.collectionView.frame.height >= strongSelf.collectionView.contentSize.height - 100
             }
+            .throttle(0.3, scheduler: MainScheduler.instance)
+            .debounce(0.3, scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+            .do {print("fired")}
             .map { _ in Reactor.Action.loadNextPage }
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
-        reactor.state.map { $0.photos }
-            .replaceNilWith([])
-            .asDriver(onErrorJustReturn: [])
-            .drive(collectionView.rx.items) { (collectionView, row, photo) in
-                let indexPath = IndexPath(row: row, section: 0)
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constant.cellIdentifier, for: indexPath) as! PhotoCell
+        // Bind CollectionView
+        reactor.state.map {$0.photos}
+//                .replaceNilWith([])
+            .bind(to: collectionView.rx.items(cellIdentifier: Constant.cellIdentifier, cellType: PhotoCell.self)) { (row, photo, cell) in
                 let url = URL(string: photo.flickrURL())
                 cell.flickrPhoto.kf.setImage(with: url)
-                
-                return cell
             }
             .disposed(by: disposeBag)
         
+        //Misc feature
+        
+        // searchbar keyboard when scroll
+        collectionView.rx.didScroll.subscribe {_ in
+            // Dismiss searchviewcontroller keyboard when scroll
+            if self.searchController.searchBar.isFirstResponder {
+                _ = self.searchController.resignFirstResponder()
+            }
+            
+//            if (self.collectionView.panGestureRecognizer.translation(in: self.collectionView.superview).y > 0) {
+//                // scroll up
+//                self.searchController.isActive = true
+//            } else {
+//                //scroll down
+//                self.searchController.isActive = false
+//            }
+            }.disposed(by:disposeBag)
     }
 }
 
@@ -178,5 +177,7 @@ extension PhotoListViewController: UICollectionViewDelegateFlowLayout{
                                  bottom: Metric.edgeInset,
                                  right: Metric.edgeInset)
     }
+    
 }
+
 

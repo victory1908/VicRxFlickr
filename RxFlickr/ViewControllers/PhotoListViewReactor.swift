@@ -13,21 +13,21 @@ import ReactorKit
 class PhotoListViewReactor : Reactor {
     
     enum Action {
-        case updateQuery(_ query: String?)
+        case updateQuery(_ query: String)
         case loadNextPage
     }
     
     enum Mutation {
-        case setQuery(_ query: String?)
-        case setPhotos(_ photos: [Photo], nextPage: Int?)
-        case appendPhotos(_ photos: [Photo], nextPage: Int?)
+        case setQuery(_ query: String)
+        case setPhotos(_ photos: [Photo], nextPage: Int)
+        case appendPhotos(_ photos: [Photo], nextPage: Int)
         case setLoadingNextPage(Bool)
     }
     
     struct State {
-        var query: String?
-        var photos: [Photo]?
-        var nextPage: Int?
+        var query: String = ""
+        var photos: [Photo] = []
+        var nextPage: Int = 1
         var isLoadingNextPage: Bool = false
     }
     
@@ -37,36 +37,39 @@ class PhotoListViewReactor : Reactor {
     
     var initialState = State()
     
-    init() { }
+    //    init() { }
     
     func mutate(action: Action) -> Observable<Mutation> {
         switch action {
-            case .updateQuery(let query):
-                
-                return Observable.concat([
-                        Observable.just(Mutation.setQuery(query)),
-                        // 2) call API and set repos (.setRepos)
-                        AppService.request(query!, 1)
-                        // cancel previous request when the new `.updateQuery` action is fired
-//                                .takeUntil(self.action.filter(isUpdateQueryAction))
-                                .map { Mutation.setPhotos($0, nextPage: $1) }
+        case .updateQuery(let query):
+            
+            return Observable.concat([
+                Observable.just(Mutation.setQuery(query)),
+                // 2) call API and set repos (.setRepos)
+                AppService.request(query, 1)
+                    // cancel previous request when the new `.updateQuery` action is fired
+                    .takeUntil(self.action.filter(isUpdateQueryAction))
+                    .map { Mutation.setPhotos($0, nextPage: $1) }
+                //                                .do {print("")}
                 ])
-            case .loadNextPage:
-                guard !self.currentState.isLoadingNextPage else { return Observable.empty() }
-                guard let page = self.currentState.nextPage else { return Observable.empty() }
-                return Observable.concat([
-                    // 1) set loading status to true
-                    Observable.just(Mutation.setLoadingNextPage(true)),
+        case .loadNextPage:
+            //guard !self.currentState.isLoadingNextPage else { return Observable.empty() }
+            //guard let page = self.currentState.nextPage else { return Observable.empty() }
+            let page = self.currentState.nextPage
+            
+            return Observable.concat([
+                //                // 1) set loading status to true
+                //                Observable.just(Mutation.setLoadingNextPage(true)),
                 
-                    // 2) call API and append repos
-                    AppService.request(self.currentState.query!, page)
-//                    .takeUntil(self.action.filter(isUpdateQueryAction))
+                // 2) call API and append repos
+                AppService.request(self.currentState.query, page)
+                    .takeUntil(self.action.filter(isUpdateQueryAction))
                     .map { Mutation.appendPhotos($0, nextPage: $1) },
                 
-                    // 3) set loading status to false
-                    Observable.just(Mutation.setLoadingNextPage(false)),
-                    ])
-
+                // 3) set loading status to false
+                Observable.just(Mutation.setLoadingNextPage(false)),
+                ])
+            
         }
     }
     
@@ -85,7 +88,7 @@ class PhotoListViewReactor : Reactor {
             
         case let .appendPhotos(photos, nextPage):
             var newState = state
-            newState.photos!.append(contentsOf: photos)
+            newState.photos.append(contentsOf: photos)
             newState.nextPage = nextPage
             return newState
             
@@ -96,12 +99,12 @@ class PhotoListViewReactor : Reactor {
         }
     }
     
-//    private func isUpdateQueryAction(_ action: Action) -> Bool {
-//        if case .updateQuery = action {
-//            return true
-//        } else {
-//            return false
-//        }
-//    }
+    private func isUpdateQueryAction(_ action: Action) -> Bool {
+        if case .updateQuery = action {
+            return true
+        } else {
+            return false
+        }
+    }
     
 }

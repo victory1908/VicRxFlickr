@@ -24,8 +24,6 @@ All code is Using API [Flickr](www.flickr.com)
 
   ---
 
-  - [SnapKit](https://github.com/SnapKit/SnapKit)
-
 - ### Networking
 
   ---
@@ -41,8 +39,7 @@ All code is Using API [Flickr](www.flickr.com)
 
 - ### Misc.
   ---
-  - [Then](https://github.com/devxoul/Then)
-
+  
 - ### Feature.
 ---
 - New MVI (Model-View-Intent) pattern
