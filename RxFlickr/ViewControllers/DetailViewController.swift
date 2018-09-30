@@ -8,6 +8,7 @@
 
 import UIKit
 import Kingfisher
+import RxSwift
 
 class DetailViewController: UIViewController {
     
@@ -17,26 +18,31 @@ class DetailViewController: UIViewController {
     
     @IBOutlet weak var titleLabel: UILabel!
     
-    var photo = Photo()
-    
+    var photo: Photo?
     
     // MARK: View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.navigationBar.prefersLargeTitles = false
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = false
+        } else {
+            // Fallback on earlier versions
+        }
+        navigationController?.hidesBarsOnSwipe = false
         setupDetailVC()
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    
-    func setupDetailVC() {
-        let url = URL(string: photo!.flickrURL())
-        self.imageView.kf.setImage(with: url)
         
-        self.titleLabel.text = photo!.title!
+    func setupDetailVC() {
+        let url = URL(string: photo?.flickrURLMedium() ?? "")
+        imageView.kf.indicatorType = .activity
+        imageView.kf.setImage(with: url)
+        titleLabel.text = photo?.title ?? ""
     }
+    
     
 }

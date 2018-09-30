@@ -22,8 +22,6 @@ target 'RxFlickr' do
 #  pod 'AlamofireNetworkActivityIndicator'
 
  # Parsing
- pod 'SwiftyJSON'
- pod 'ObjectMapper'
 
  # Misc.
 # pod 'Then'

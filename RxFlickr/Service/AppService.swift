@@ -8,8 +8,7 @@
 
 import RxSwift
 import Alamofire
-import SwiftyJSON
-import ObjectMapper
+import UIKit
 
 class AppService {
     static let BASE_URL = "https://api.flickr.com/services/rest/"
@@ -31,11 +30,10 @@ class AppService {
             params["page"] = "\(page)"
             params["text"] = query
             
-            Alamofire.request(BASE_URL, parameters: params, headers: headers).responseJSON { response in
-            switch response.result {
+            Alamofire.request(BASE_URL, parameters: params, headers: headers).responseData { response in
+                switch response.result {
                 case .success(let value):
-                    let result = JSON(value)["photos"]["photo"].rawString()
-                    let photos = Mapper<Photo>().mapArray(JSONString: result!)
+                    let photos = Photo.photosFromApi(data: value)
                     let nextPage = page + 1
                     observer.onNext(((photos ?? []),nextPage))
                     observer.onCompleted()
@@ -48,5 +46,16 @@ class AppService {
             return Disposables.create()
         }
     }
+    
+//    static func sharePhotos (_ photos: [Photos]) -> Observable<()> {
+//        return Observable.create({ (observer) -> Disposable in
+//
+//            let UIAC
+//
+//            return Disposables.create()
+//        })
+//
+//    }
+    
 }
 
