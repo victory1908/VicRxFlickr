@@ -131,15 +131,16 @@ class PhotoListVC: UIViewController, StoryboardView {
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
         
+        
         // Share
+        let shareButton = UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil)
+        let sharingDetailItem = UIBarButtonItem(customView: self.shareTextLabel)
+        let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: nil, action: nil)
         
         let sharingState = reactor.state.map{$0.isSharing}.share()
-        
-        guard let shareButton = self.navigationItem.rightBarButtonItems?.first else {
-            return
-        }
-        let sharingDetailItem = UIBarButtonItem(customView: self.shareTextLabel)
-        
+    
+        self.navigationItem.rightBarButtonItem = shareButton
+        self.navigationItem.leftBarButtonItem = cancelButton
         
         sharingState.filter{$0}
             .map { _ in
@@ -149,6 +150,7 @@ class PhotoListVC: UIViewController, StoryboardView {
                 self.shareTextLabel.sizeToFit()
                 self.shareTextLabel.text = "\(self.sharePhotos.count) selected"
                 self.navigationItem.setRightBarButtonItems([shareButton,sharingDetailItem], animated: true)
+                self.navigationItem.setLeftBarButton(cancelButton, animated: true)
             }
             .subscribe(onNext: {
                 
@@ -160,6 +162,7 @@ class PhotoListVC: UIViewController, StoryboardView {
                 self.title = "Rx Search"
                 self.collectionView.allowsMultipleSelection = false
                 self.navigationItem.setRightBarButtonItems([shareButton], animated: true)
+                self.navigationItem.leftBarButtonItem = nil
                 self.shareTextLabel.text = ""
             }
             .subscribe(onNext: {
@@ -169,6 +172,20 @@ class PhotoListVC: UIViewController, StoryboardView {
         
         let shareButtonTap = self.navigationItem.rightBarButtonItems!.first!.rx.tap.throttle(3, scheduler: MainScheduler.instance)
             .share()
+        
+        let cancelButtonTap = self.navigationItem.leftBarButtonItem!.rx.tap.throttle(3, scheduler: MainScheduler.instance).share()
+        
+        cancelButtonTap.map {Reactor.Action.shareFinish}
+                        .bind(to: reactor.action)
+                        .disposed(by: disposeBag)
+        cancelButtonTap.map {_ in
+            self.sharePhotos.removeAll()
+            self.collectionView.deselectAllItems(animated: true)
+            self.shareTextLabel.text = ""
+        }.subscribe(onNext: {
+
+        })
+        .disposed(by: disposeBag)
         
         //-select Deselect share photos
         
@@ -186,10 +203,12 @@ class PhotoListVC: UIViewController, StoryboardView {
             .filter(if: reactor.state.map{$0.isSharing})
             .subscribe(onNext: { photo in
                 self.sharePhotos.removeAll(where: { $0.id == photo.id })
+                self.shareTextLabel.text = "\(self.sharePhotos.count) selected"
             }).disposed(by: disposeBag)
         
         shareButtonTap
             .filter(if: reactor.state.map{!$0.isSharing})
+            .filter(if: reactor.state.map{$0.photos.isNotEmpty})
             .map {Reactor.Action.setSharingState(isSharing: true)}
             .bind(to: reactor.action)
             .disposed(by: disposeBag)
