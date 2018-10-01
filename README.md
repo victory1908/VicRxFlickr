@@ -22,7 +22,7 @@ All code is Using API [Flickr](www.flickr.com)
 
 - ### UI
 
-  ---
+  --- 
 
 - ### Networking
 
@@ -34,11 +34,12 @@ All code is Using API [Flickr](www.flickr.com)
 - ### Parsing
   ---
 
-  - [SwiftyJSON](https://github.com/SwiftyJSON/SwiftyJSON)
-  - [ObjectMapper](https://github.com/Hearst-DD/ObjectMapper)
+- ### Database
+    - - [RxRealm](https://github.com/RxSwiftCommunity/RxRealm)
 
 - ### Misc.
   ---
+
   
 - ### Feature.
 ---
@@ -47,14 +48,17 @@ All code is Using API [Flickr](www.flickr.com)
 - display images in collectionView (Asyncronous loading)
 - paginated scrolling (endless scrolling)
 - detail picture page
+- Sharing feature (User can select multiple image to share) 
+- Favourite feature (User can store image to and view offline)
+- managable favourite images (user can add and delete favourite album )
+- Realtime update (search images, favourite images will be update automatically)
 
 - ### Feature can be updated (Due to time constrant and not included in requirement).
 ---
 - search history
-- save images to disk
-- share image to social network
+- save images to photo album
 - create collection of favorite images
-
+- upload images to user account on sharing services
 <br>
 <br>
 <br>

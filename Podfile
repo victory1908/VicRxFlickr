@@ -10,7 +10,7 @@ target 'RxFlickr' do
  # Rx
  pod 'RxSwift'
  pod 'RxCocoa'
-#  pod 'RxDataSources'
+ pod 'RxDataSources'
  pod 'RxOptional'
 
  # UI
@@ -21,8 +21,11 @@ target 'RxFlickr' do
  pod 'Kingfisher'
 #  pod 'AlamofireNetworkActivityIndicator'
 
- # Parsing
+# Parsing
 
+# Persistent
+  pod 'RealmSwift'
+  pod 'RxRealm'
  # Misc.
 # pod 'Then'
 

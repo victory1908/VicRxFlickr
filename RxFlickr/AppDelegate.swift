@@ -7,18 +7,40 @@
 //
 
 import UIKit
+import RealmSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     
+    let realmManager = RealmManager()
+//    let realm = try? Realm()
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        let navigationController = self.window?.rootViewController as! UINavigationController
-        let viewController = navigationController.viewControllers.first as! PhotoListViewController
+        let tabBarController = self.window?.rootViewController as! UITabBarController
+        let navigationController = tabBarController.viewControllers?.first as! UINavigationController
+        
+        
+//        let navigationController = self.window?.rootViewController as! UINavigationController
+        let viewController = navigationController.viewControllers.first as! PhotoListVC
         viewController.reactor = PhotoListViewReactor()
+        viewController.realmManager = self.realmManager
+        
+        
+        let favouriteNav = tabBarController.viewControllers?.last as! UINavigationController
+        let favouriteVC = favouriteNav.viewControllers.first as! FavouriteVC
+        favouriteVC.realmManager = self.realmManager
+        
+        Realm.Configuration.defaultConfiguration = Realm.Configuration(
+            schemaVersion: 1,
+            migrationBlock: { migration, oldSchemaVersion in
+                if (oldSchemaVersion < 1) {
+                    //write the migration logic here
+                }
+        })
         
         return true
     }

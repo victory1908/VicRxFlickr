@@ -40,6 +40,7 @@ class AppService {
                     
                 case .failure(let error):
                     observer.onError(error)
+                    print("error in network")
                     print(error)
                 }
             }

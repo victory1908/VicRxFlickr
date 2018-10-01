@@ -1,48 +1,66 @@
 PODS:
   - Alamofire (4.7.3)
+  - Differentiator (3.1.0)
   - Kingfisher (4.10.0)
-  - ObjectMapper (3.3.0)
   - ReactorKit (1.2.0):
     - RxSwift (>= 4.0.0)
+  - Realm (3.10.0):
+    - Realm/Headers (= 3.10.0)
+  - Realm/Headers (3.10.0)
+  - RealmSwift (3.10.0):
+    - Realm (= 3.10.0)
   - RxCocoa (4.3.1):
+    - RxSwift (~> 4.0)
+  - RxDataSources (3.1.0):
+    - Differentiator (~> 3.0)
+    - RxCocoa (~> 4.0)
     - RxSwift (~> 4.0)
   - RxOptional (3.5.0):
     - RxCocoa (~> 4.0)
     - RxSwift (~> 4.0)
+  - RxRealm (0.7.5):
+    - RealmSwift (~> 3.0)
+    - RxSwift (~> 4.0)
   - RxSwift (4.3.1)
-  - SwiftyJSON (4.2.0)
 
 DEPENDENCIES:
   - Alamofire
   - Kingfisher
-  - ObjectMapper
   - ReactorKit
+  - RealmSwift
   - RxCocoa
+  - RxDataSources
   - RxOptional
+  - RxRealm
   - RxSwift
-  - SwiftyJSON
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
+    - Differentiator
     - Kingfisher
-    - ObjectMapper
     - ReactorKit
+    - Realm
+    - RealmSwift
     - RxCocoa
+    - RxDataSources
     - RxOptional
+    - RxRealm
     - RxSwift
-    - SwiftyJSON
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
+  Differentiator: be49ca3408f0ecfc761e4c7763d20c62be01b9ad
   Kingfisher: 43c4b802d8b5256cf1f4379e9cd10b329be6d3e2
-  ObjectMapper: b612bf8c8e99c4dc0bb6013a51f7c27966ed5da9
   ReactorKit: 18ca466f1e77fef1827addeb921fba8ae14edd63
+  Realm: 85ab9e4f779d66f6e9ffeb118dc25b7f130c96ac
+  RealmSwift: 69121c8b86d0ae005fb779efdb10e606732e1c74
   RxCocoa: 78763c7b07d02455598d9fc3c1ad091a28b73635
+  RxDataSources: a843bad90c29817f5923ec8163f4af2de084ceb3
   RxOptional: bd32ff8ca9df4177683d56ffeb618a9d4d5d5cad
+  RxRealm: a6c6c0a07cb61f34209969ca6657734edfdfff30
   RxSwift: fe0fd770a43acdb7d0a53da411c9b892e69bb6e4
-  SwiftyJSON: c4bcba26dd9ec7a027fc8eade48e2c911f229e96
 
-PODFILE CHECKSUM: 543295296e001fbc3b3f279035106436bb2367ff
+PODFILE CHECKSUM: 567c40f819f8f927311ca028c93bb27c1b0089bb
 
 COCOAPODS: 1.5.3
